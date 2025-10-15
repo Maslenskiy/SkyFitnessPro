@@ -13,10 +13,36 @@ const Register: React.FC<ModalProps> = ({ closeModal, toggleModal }) => {
 	const [password, setPassword] = useState("");
 	const [copyPassword, setcopyPassword] = useState("");
 	const [error, setError] = useState("");
+	const [validationErrors, setValidationErrors] = useState<{email?: string; password?: string; copyPassword?: string}>({});
+
+	const validateForm = () => {
+		const errors: {email?: string; password?: string; copyPassword?: string} = {};
+		
+		if (!email.trim()) {
+			errors.email = "Поле email обязательно для заполнения";
+		}
+		
+		if (!password.trim()) {
+			errors.password = "Поле пароль обязательно для заполнения";
+		}
+		
+		if (!copyPassword.trim()) {
+			errors.copyPassword = "Поле повтор пароля обязательно для заполнения";
+		}
+		
+		if (password && copyPassword && password !== copyPassword) {
+			errors.copyPassword = "Пароли не совпадают";
+		}
+		
+		setValidationErrors(errors);
+		return Object.keys(errors).length === 0;
+	};
 
 	function register() {
-		if (password !== copyPassword) {
-			setError("Пароли не совпадают");
+		setError("");
+		setValidationErrors({});
+		
+		if (!validateForm()) {
 			return;
 		}
 
@@ -52,36 +78,51 @@ const Register: React.FC<ModalProps> = ({ closeModal, toggleModal }) => {
 
 				<div className="flex flex-col items-center gap-8 w-[280px] h-[auto]">
 					<div className="flex flex-col items-center gap-[10px] w-[280px]">
-						<div className="flex flex-row items-center gap-2 w-[280px] h-[52px] border border-gray-300 rounded-[8px]">
-							<input
-								type="email"
-								placeholder="Эл. почта"
-								className="text-[18px] w-full h-[49px] text-base font-normal text-black-400 rounded-[8px] p-[18px]"
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-							/>
+						<div className="flex flex-col w-[280px]">
+							<div className="flex flex-row items-center gap-2 w-[280px] h-[52px] border border-gray-300 rounded-[8px]">
+								<input
+									type="email"
+									placeholder="Эл. почта"
+									className="text-[18px] w-full h-[49px] text-base font-normal text-black-400 rounded-[8px] p-[18px]"
+									value={email}
+									onChange={(e) => setEmail(e.target.value)}
+								/>
+							</div>
+							{validationErrors.email && (
+								<p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>
+							)}
 						</div>
 
-						<div className="flex flex-row items-center gap-2 w-[280px] h-[52px] border border-gray-300 rounded-[8px]">
-							<input
-								type="password"
-								placeholder="Пароль"
-								className="text-[18px] w-full h-[49px] text-base font-normal text-black-400 rounded-[8px] p-[18px]"
-								value={password}
-								onChange={(e) => setPassword(e.target.value)}
-							/>
+						<div className="flex flex-col w-[280px]">
+							<div className="flex flex-row items-center gap-2 w-[280px] h-[52px] border border-gray-300 rounded-[8px]">
+								<input
+									type="password"
+									placeholder="Пароль"
+									className="text-[18px] w-full h-[49px] text-base font-normal text-black-400 rounded-[8px] p-[18px]"
+									value={password}
+									onChange={(e) => setPassword(e.target.value)}
+								/>
+							</div>
+							{validationErrors.password && (
+								<p className="text-red-500 text-sm mt-1">{validationErrors.password}</p>
+							)}
 						</div>
 
-						<div className="flex flex-row items-center gap-2 w-[280px] h-[52px] border border-gray-300 rounded-[8px]">
-							<input
-								type="password"
-								placeholder="Повторите пароль"
-								className="text-[18px] w-full h-[49px] text-base font-normal text-black-400 rounded-[8px] p-[18px]"
-								value={copyPassword}
-								onChange={(e) => setcopyPassword(e.target.value)}
-							/>
+						<div className="flex flex-col w-[280px]">
+							<div className="flex flex-row items-center gap-2 w-[280px] h-[52px] border border-gray-300 rounded-[8px]">
+								<input
+									type="password"
+									placeholder="Повторите пароль"
+									className="text-[18px] w-full h-[49px] text-base font-normal text-black-400 rounded-[8px] p-[18px]"
+									value={copyPassword}
+									onChange={(e) => setcopyPassword(e.target.value)}
+								/>
+							</div>
+							{validationErrors.copyPassword && (
+								<p className="text-red-500 text-sm mt-1">{validationErrors.copyPassword}</p>
+							)}
 						</div>
-						<p>{error ? error : ""}</p>
+						{error && <p className="text-red-500 text-sm">{error}</p>}
 					</div>
 
 					<div className="flex flex-col items-center gap-2 w-[280px]">

@@ -10,8 +10,27 @@ const ResetPassword: React.FC<ModalProps> = ({ closeModal }) => {
 	const [email, setEmail] = useState("");
 	const [message, setMessage] = useState("");
 	const [isEmailSent, setIsEmailSent] = useState(false);
+	const [validationErrors, setValidationErrors] = useState<{email?: string}>({});
+
+	const validateForm = () => {
+		const errors: {email?: string} = {};
+		
+		if (!email.trim()) {
+			errors.email = "Поле email обязательно для заполнения";
+		}
+		
+		setValidationErrors(errors);
+		return Object.keys(errors).length === 0;
+	};
 
 	const handleResetPassword = async (): Promise<void> => {
+		setMessage("");
+		setValidationErrors({});
+		
+		if (!validateForm()) {
+			return;
+		}
+
 		try {
 			await sendPasswordResetEmail(auth, email).then(() => {
 				setIsEmailSent(true);
@@ -35,14 +54,19 @@ const ResetPassword: React.FC<ModalProps> = ({ closeModal }) => {
 				<div className="flex flex-col items-center gap-8 w-[280px] h-[auto]">
 					{!isEmailSent && (
 						<div className="flex flex-col items-start gap-[10px] w-[280px]">
-							<div className="flex flex-row items-center gap-2 w-[280px] h-[52px] border border-gray-300 rounded-[8px]">
-								<input
-									type="email"
-									placeholder="Введите ваш email"
-									value={email}
-									onChange={(e) => setEmail(e.target.value)}
-									className="text-[18px] w-full h-[49px] text-base font-normal text-black-400 rounded-[8px] p-[18px]"
-								/>
+							<div className="flex flex-col w-[280px]">
+								<div className="flex flex-row items-center gap-2 w-[280px] h-[52px] border border-gray-300 rounded-[8px]">
+									<input
+										type="email"
+										placeholder="Введите ваш email"
+										value={email}
+										onChange={(e) => setEmail(e.target.value)}
+										className="text-[18px] w-full h-[49px] text-base font-normal text-black-400 rounded-[8px] p-[18px]"
+									/>
+								</div>
+								{validationErrors.email && (
+									<p className="text-red-500 text-sm mt-1">{validationErrors.email}</p>
+								)}
 							</div>
 						</div>
 					)}
@@ -58,7 +82,7 @@ const ResetPassword: React.FC<ModalProps> = ({ closeModal }) => {
 						</div>
 					)}
 
-					{message && <p>{message}</p>}
+					{message && <p className={isEmailSent ? "text-green-500 text-sm" : "text-red-500 text-sm"}>{message}</p>}
 				</div>
 			</div>
 		</div>
